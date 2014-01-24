@@ -6,7 +6,44 @@ DIV ON THE PAGE.
 This function is passed the variables to initially draw on the x and y axes.
 **/
 function init(xAxis, yAxis){
+	var w = 540;
+	var h = 540;
+	var padding = 5;
+	var dataset = [];
 
+	//Selecting svg element
+	var svg = d3.select("#vis")
+		.append("svg")
+		.attr("width", w)
+		.attr("height", h);
+
+	//Scale functions
+	var xScale = d3.scale.linear()
+	    .domain([5, 10])
+	    .range([0, w]);
+
+    var yScale = d3.scale.linear()
+	    .domain([2, 4])
+	    .range([0, h]);
+
+	//Getting data from csv file
+	d3.csv("/data/data.csv", function(data) {
+		dataset = data;
+
+		//Adding circles to svg element
+		svg.selectAll("circle")
+			.data(dataset)
+			.enter()
+			.append("circle")
+			.attr("cx", function(d) {
+				console.log(+d[xAxis]);
+				return xScale(+d[xAxis]);
+			})
+			.attr("cy", function(d) {
+				return yScale(+d[yAxis]);
+			})
+			.attr("r", 5);
+	});
 }
 
 /**
