@@ -6,9 +6,9 @@ DIV ON THE PAGE.
 This function is passed the variables to initially draw on the x and y axes.
 **/
 function init(xAxis, yAxis){
-	var w = 900;
-	var h = 540;
-	var padding = 5;
+	var w = 1024;
+	var h = 750;
+	var padding = 20;
 	var dataset = [];
 
 	//Selecting svg element
@@ -20,11 +20,11 @@ function init(xAxis, yAxis){
 	//Scale functions
 	var xScale = d3.scale.linear()
 	    .domain([5, 7])
-	    .range([0, w]);
+	    .range([padding, w-padding]);
 
     var yScale = d3.scale.linear()
 	    .domain([2, 4])
-	    .range([0, h]);
+	    .range([h-padding, padding]);
 
 	//Getting data from csv file
 	d3.csv("/data/data.csv", function(data) {
@@ -39,7 +39,7 @@ function init(xAxis, yAxis){
 				return xScale(+d[xAxis]);
 			})
 			.attr("cy", function(d) {
-				return h - yScale(+d[yAxis]);
+				return yScale(+d[yAxis]);
 			})
 			.attr("r", 5);
 
@@ -54,7 +54,7 @@ function init(xAxis, yAxis){
 				return xScale(+d[xAxis]);
 			})
 			.attr("y", function(d) {
-				return h - yScale(+d[yAxis]);
+				return yScale(+d[yAxis]);
 			})
 			.attr("font-family", "sans-serif")
 			.attr("font-size", "12px")
