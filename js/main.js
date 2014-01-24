@@ -5,9 +5,9 @@ DIV ON THE PAGE.
 
 This function is passed the variables to initially draw on the x and y axes.
 **/
-function init(xAxis, yAxis){
+function init(xAxisLabel, yAxisLabel){
 	var w = 1024;
-	var h = 750;
+	var h = 540;
 	var padding = 20;
 	var dataset = [];
 
@@ -23,7 +23,7 @@ function init(xAxis, yAxis){
 	    .range([padding, w-padding]);
 
     var yScale = d3.scale.linear()
-	    .domain([2, 4])
+	    .domain([2.5, 4.5])
 	    .range([h-padding, padding]);
 
 	//Getting data from csv file
@@ -36,10 +36,10 @@ function init(xAxis, yAxis){
 			.enter()
 			.append("circle")
 			.attr("cx", function(d) {
-				return xScale(+d[xAxis]);
+				return xScale(+d[xAxisLabel]);
 			})
 			.attr("cy", function(d) {
-				return yScale(+d[yAxis]);
+				return yScale(+d[yAxisLabel]);
 			})
 			.attr("r", 5);
 
@@ -48,18 +48,30 @@ function init(xAxis, yAxis){
 			.enter()
 			.append("text")
 			.text(function(d) {
-				return d[xAxis] + ", " + d[yAxis];
+				return d[xAxisLabel] + ", " + d[yAxisLabel];
 			})
 			.attr("x", function(d) {
-				return xScale(+d[xAxis]);
+				return xScale(+d[xAxisLabel]);
 			})
 			.attr("y", function(d) {
-				return yScale(+d[yAxis]);
+				return yScale(+d[yAxisLabel]);
 			})
 			.attr("font-family", "sans-serif")
 			.attr("font-size", "12px")
 			.attr("fill", "red");
 	});
+
+	//Axes
+	var xAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient("bottom");
+
+	//Added axes to document
+	svg.append("g")
+		.attr("class", "axis")
+		.attr("transform", "translate(0," + (h - padding) + ")")
+		.call(xAxis);
+
 }
 
 /**
