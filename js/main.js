@@ -10,6 +10,7 @@ function init(xAxisLabel, yAxisLabel){
 	var h = 540;
 	var padding = 40;
 	var dataset = [];
+	var colors = [d3.rgb("#17becf"), d3.rgb("#e6550d"), d3.rgb("#2ca02c")];
 
 	//Selecting svg element
 	var svg = d3.select("#vis")
@@ -51,7 +52,18 @@ function init(xAxisLabel, yAxisLabel){
 			.attr("cy", function(d) {
 				return yScale(+d[yAxisLabel]);
 			})
-			.attr("r", 5);
+			.attr("r", 5)
+			.attr("fill", function(d){
+				if (d["variety"] == "Kama") {
+					return colors[0];
+				}
+				else if (d["variety"] == "Rosa") {
+					return colors[1];
+				}
+				else {
+					return colors[2];
+				}
+			});
 
 	});
 
