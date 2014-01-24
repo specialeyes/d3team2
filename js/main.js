@@ -8,7 +8,7 @@ This function is passed the variables to initially draw on the x and y axes.
 function init(xAxisLabel, yAxisLabel){
 	var w = 1024;
 	var h = 540;
-	var padding = 20;
+	var padding = 40;
 	var dataset = [];
 
 	//Selecting svg element
@@ -20,11 +20,13 @@ function init(xAxisLabel, yAxisLabel){
 	//Scale functions
 	var xScale = d3.scale.linear()
 	    .domain([5, 7])
-	    .range([padding, w-padding]);
+	    .range([padding, w-padding])
+	    .nice();
 
     var yScale = d3.scale.linear()
 	    .domain([2.5, 4.5])
-	    .range([h-padding, padding]);
+	    .range([h-padding, padding])
+	    .nice();
 
 	//Getting data from csv file
 	d3.csv("/data/data.csv", function(data) {
@@ -65,12 +67,19 @@ function init(xAxisLabel, yAxisLabel){
 	var xAxis = d3.svg.axis()
 		.scale(xScale)
 		.orient("bottom");
+	var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.orient("left");
 
 	//Added axes to document
 	svg.append("g")
 		.attr("class", "axis")
 		.attr("transform", "translate(0," + (h - padding) + ")")
 		.call(xAxis);
+	svg.append("g")
+		.attr("class", "axis")
+		.attr("transform", "translate(" + padding + ", 0)")
+		.call(yAxis);
 
 }
 
