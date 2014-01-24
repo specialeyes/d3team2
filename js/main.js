@@ -28,6 +28,14 @@ function init(xAxisLabel, yAxisLabel){
 	    .range([h-padding, padding])
 	    .nice();
 
+	//Axes
+	var xAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient("bottom");
+	var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.orient("left");
+
 	//Getting data from csv file
 	d3.csv("/data/data.csv", function(data) {
 		dataset = data;
@@ -45,31 +53,7 @@ function init(xAxisLabel, yAxisLabel){
 			})
 			.attr("r", 5);
 
-		svg.selectAll("text")
-			.data(dataset)
-			.enter()
-			.append("text")
-			.text(function(d) {
-				return d[xAxisLabel] + ", " + d[yAxisLabel];
-			})
-			.attr("x", function(d) {
-				return xScale(+d[xAxisLabel]);
-			})
-			.attr("y", function(d) {
-				return yScale(+d[yAxisLabel]);
-			})
-			.attr("font-family", "sans-serif")
-			.attr("font-size", "12px")
-			.attr("fill", "red");
 	});
-
-	//Axes
-	var xAxis = d3.svg.axis()
-		.scale(xScale)
-		.orient("bottom");
-	var yAxis = d3.svg.axis()
-		.scale(yScale)
-		.orient("left");
 
 	//Added axes to document
 	svg.append("g")
