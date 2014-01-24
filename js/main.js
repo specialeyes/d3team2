@@ -6,7 +6,7 @@ DIV ON THE PAGE.
 This function is passed the variables to initially draw on the x and y axes.
 **/
 function init(xAxis, yAxis){
-	var w = 540;
+	var w = 900;
 	var h = 540;
 	var padding = 5;
 	var dataset = [];
@@ -19,7 +19,7 @@ function init(xAxis, yAxis){
 
 	//Scale functions
 	var xScale = d3.scale.linear()
-	    .domain([5, 10])
+	    .domain([5, 7])
 	    .range([0, w]);
 
     var yScale = d3.scale.linear()
@@ -36,13 +36,29 @@ function init(xAxis, yAxis){
 			.enter()
 			.append("circle")
 			.attr("cx", function(d) {
-				console.log(+d[xAxis]);
 				return xScale(+d[xAxis]);
 			})
 			.attr("cy", function(d) {
-				return yScale(+d[yAxis]);
+				return h - yScale(+d[yAxis]);
 			})
 			.attr("r", 5);
+
+		svg.selectAll("text")
+			.data(dataset)
+			.enter()
+			.append("text")
+			.text(function(d) {
+				return d[xAxis] + ", " + d[yAxis];
+			})
+			.attr("x", function(d) {
+				return xScale(+d[xAxis]);
+			})
+			.attr("y", function(d) {
+				return h - yScale(+d[yAxis]);
+			})
+			.attr("font-family", "sans-serif")
+			.attr("font-size", "12px")
+			.attr("fill", "red");
 	});
 }
 
