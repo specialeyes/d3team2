@@ -5,7 +5,77 @@ DIV ON THE PAGE.
 
 This function is passed the variables to initially draw on the x and y axes.
 **/
-function init(xAxis, yAxis){
+function init(xAxisLabel, yAxisLabel){
+	var w = 1024;
+	var h = 540;
+	var padding = 40;
+	var dataset = [];
+	var colors = [d3.rgb("#17becf"), d3.rgb("#e6550d"), d3.rgb("#2ca02c")];
+
+	//Selecting svg element
+	var svg = d3.select("#vis")
+		.append("svg")
+		.attr("width", w)
+		.attr("height", h);
+
+	//Scale functions
+	var xScale = d3.scale.linear()
+	    .domain([5, 7])
+	    .range([padding, w-padding])
+	    .nice();
+
+    var yScale = d3.scale.linear()
+	    .domain([2.5, 4.5])
+	    .range([h-padding, padding])
+	    .nice();
+
+	//Axes
+	var xAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient("bottom");
+	var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.orient("left");
+
+	//Getting data from csv file
+	d3.csv("/data/data.csv", function(data) {
+		dataset = data;
+
+		//Adding circles to svg element
+		svg.selectAll("circle")
+			.data(dataset)
+			.enter()
+			.append("circle")
+			.attr("cx", function(d) {
+				return xScale(+d[xAxisLabel]);
+			})
+			.attr("cy", function(d) {
+				return yScale(+d[yAxisLabel]);
+			})
+			.attr("r", 5)
+			.attr("fill", function(d){
+				if (d["variety"] == "Kama") {
+					return colors[0];
+				}
+				else if (d["variety"] == "Rosa") {
+					return colors[1];
+				}
+				else {
+					return colors[2];
+				}
+			});
+
+	});
+
+	//Added axes to document
+	svg.append("g")
+		.attr("class", "axis")
+		.attr("transform", "translate(0," + (h - padding) + ")")
+		.call(xAxis);
+	svg.append("g")
+		.attr("class", "axis")
+		.attr("transform", "translate(" + padding + ", 0)")
+		.call(yAxis);
 
 }
 
