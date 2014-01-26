@@ -10,8 +10,9 @@ function init(xAxisLabel, yAxisLabel){
 	var h = 540;
 	var padding = 40;
 	dataset = [];
-	var colors = [d3.rgb("#17becf"), d3.rgb("#e6550d"), d3.rgb("#2ca02c")];
-
+	colors = [d3.rgb("#17becf"), d3.rgb("#e6550d"), d3.rgb("#2ca02c")];
+	selectColor = [d3.rgb("#0A5057"), d3.rgb("#813007"), d3.rgb("#164E16")];
+	
 	//Selecting svg element
 	svg = d3.select("#vis")
 		.append("svg")
@@ -37,6 +38,7 @@ function init(xAxisLabel, yAxisLabel){
 		.scale(yScale)
 		.orient("left");
 
+	
 	//Getting data from csv file
 	d3.csv("/data/data.csv", function(data) {
 		dataset = data;
@@ -52,7 +54,7 @@ function init(xAxisLabel, yAxisLabel){
 			.attr("cy", function(d) {
 				return yScale(+d[yAxisLabel]);
 			})
-			.attr("r", 5)
+			.attr("r", 6)
 			.attr("fill", function(d){
 				if (d["variety"] == "Kama") {
 					return colors[0];
@@ -63,6 +65,21 @@ function init(xAxisLabel, yAxisLabel){
 				else {
 					return colors[2];
 				}
+			})
+			.on("click", function(d) { 
+			
+			changeOpacity(d["variety"]);
+			if (d["variety"] == "Kama") {
+					this.setAttribute("fill", selectColor[0]);
+				}
+				else if (d["variety"] == "Rosa") {
+					this.setAttribute("fill", selectColor[1]);
+				}
+				else {
+					this.setAttribute("fill", selectColor[2]);
+				}
+			return showDetails("Compactness: " + (+d["compactness"]) + "<br/> Kernel Length: " + (+d["kernelLength"]) + "<br/>Kernel Width: " + (+d["kernelWidth"]) + "<br/>Asymmetry Coefficient: " + (+d["asymmetryCoefficient"]) + "<br/>Groove Length: " + (+d["grooveLength"]));
+			
 			});
 
 	});
@@ -103,7 +120,7 @@ function onXAxisChange(value){
 			.data(dataset);
 			
 	circle.enter().append("circle")
-			.attr("r", 5);
+			.attr("r", 6);
 			
 	circle.attr("cx", function(d){return xScale(+d[value])});
 	
@@ -126,7 +143,7 @@ function onYAxisChange(value){
 			.data(dataset);
 			
 	circle.enter().append("circle")
-			.attr("r", 5);
+			.attr("r", 6);
 			
 	circle.attr("cy", function(d){return yScale(+d[value])});
 	
@@ -142,4 +159,41 @@ a string and it will be displayed. For example,
 **/
 function showDetails(string){
     d3.select('#details').html(string);
+	
+}
+
+function changeOpacity(type) {
+
+	var circle = svg.selectAll("circle")
+			.data(dataset);
+			
+	circle.enter().append("circle")
+			.attr("r", 6);
+			
+	circle.attr("fill", function(d){
+				if (d["variety"] == "Kama") {
+					return colors[0];
+				}
+				else if (d["variety"] == "Rosa") {
+					return colors[1];
+				}
+				else {
+					return colors[2];
+				}
+			});
+			
+	circle.attr("opacity", function(d){ 
+	
+	if (d["variety"] != type) {
+		return 0.2;
+	} 
+	else { 
+		return 1;
+	}
+				
+	});
+	
+	circle.exit().remove();
+
+
 }
