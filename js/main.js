@@ -21,20 +21,18 @@ function init(xAxisLabel, yAxisLabel){
 
 	//Scale functions
 	xScale = d3.scale.linear()
-	    .domain([5, 7])
 	    .range([padding, w-padding])
 	    .nice();
 
     yScale = d3.scale.linear()
-	    .domain([2.5, 4.5])
 	    .range([h-padding, padding])
 	    .nice();
 
 	//Axes
-	xAxis = d3.svg.axis()
+	var xAxis = d3.svg.axis()
 		.scale(xScale)
 		.orient("bottom");
-	yAxis = d3.svg.axis()
+	var yAxis = d3.svg.axis()
 		.scale(yScale)
 		.orient("left");
 
@@ -42,6 +40,11 @@ function init(xAxisLabel, yAxisLabel){
 	//Getting data from csv file
 	d3.csv("/data/data.csv", function(data) {
 		dataset = data;
+
+		//Scale Functions
+		xScale.domain(calculateDomain(dataset, xAxisLabel));
+
+	    yScale.domain(calculateDomain(dataset, yAxisLabel));
 
 		//Adding circles to svg element
 		svg.selectAll("circle")
@@ -82,30 +85,32 @@ function init(xAxisLabel, yAxisLabel){
 			
 			});
 
+		//Added axes to document
+		xAxisDisplay = svg.append("g")
+			.attr("class", "axis xAxis")
+			.attr("transform", "translate(0," + (h - padding) + ")")
+			.call(xAxis)
+			.append("text")
+			.attr("class", "xlabel")
+			.attr("x", w)
+			.attr("y", -6)
+			.style("text-anchor", "end")
+			.text(xAxisLabel.replace(/([A-Z])/g, ' $1')
+			.replace(/^./, function(str){ return str.toUpperCase(); }) + " (cm)");
+		yAxisDisplay = svg.append("g")
+			.attr("class", "axis yAxis")
+			.attr("transform", "translate(" + padding + ", 0)")
+			.call(yAxis)
+			.append("text")
+			.attr("class", "ylabel")
+			.attr("dy", ".75em" )
+			.attr("y", 6)
+			.attr("transform", "rotate(-90)")
+			.style("text-anchor", "end")
+			.text(yAxisLabel.replace(/([A-Z])/g, ' $1')
+			.replace(/^./, function(str){ return str.toUpperCase(); }) + " (cm)");
 	});
 
-	//Added axes to document
-	svg.append("g")
-		.attr("class", "axis")
-		.attr("transform", "translate(0," + (h - padding) + ")")
-		.call(xAxis)
-		.append("text")
-		.attr("class", "xlabel")
-		.attr("x", w)
-		.attr("y", -6)
-		.style("text-anchor", "end")
-		.text(xAxisLabel + " (cm)");
-	svg.append("g")
-		.attr("class", "axis")
-		.attr("transform", "translate(" + padding + ", 0)")
-		.call(yAxis)
-		.append("text")
-		.attr("class", "ylabel")
-		.attr("dy", ".75em" )
-		.attr("y", 6)
-		.attr("transform", "rotate(-90)")
-		.style("text-anchor", "end")
-		.text(yAxisLabel + " (cm)");
 }
 
 /**
@@ -121,6 +126,19 @@ function onXAxisChange(value){
 			
 	circle.enter().append("circle")
 			.attr("r", 6);
+
+
+	//Recalculate domain
+	xScale.domain(calculateDomain(dataset, value));
+	var xAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient("bottom");
+	//Update axis
+	svg.selectAll("g.xAxis").call(xAxis);
+
+	//Update text display
+	svg.selectAll(".xlabel").text(value.replace(/([A-Z])/g, ' $1')
+		.replace(/^./, function(str){ return str.toUpperCase(); }));
 			
 	circle.attr("cx", function(d){return xScale(+d[value])});
 	
@@ -141,10 +159,20 @@ function onYAxisChange(value){
 
 	var circle = svg.selectAll("circle")
 			.data(dataset);
-			
+
 	circle.enter().append("circle")
 			.attr("r", 6);
-			
+
+	yScale.domain(calculateDomain(dataset, value));
+	var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.orient("left");
+	svg.selectAll("g.yAxis").call(yAxis);
+
+	//Update text display
+	svg.selectAll(".ylabel").text(value.replace(/([A-Z])/g, ' $1')
+		.replace(/^./, function(str){ return str.toUpperCase(); }));
+
 	circle.attr("cy", function(d){return yScale(+d[value])});
 	
 	circle.exit().remove();
@@ -195,5 +223,13 @@ function changeOpacity(type) {
 	
 	circle.exit().remove();
 
+
+}
+function calculateDomain(dataset, label) {
+	var minimum = d3.min(dataset, function(d) {
+		return +d[label]});
+	var maximum = d3.max(dataset, function(d) {
+		return +d[label]});
+	return [minimum, maximum];
 
 }
