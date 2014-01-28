@@ -276,4 +276,6 @@ function reset() {
 	
 	circle.exit().remove();
 	
+	d3.select('#details').html("");
+	
 }
