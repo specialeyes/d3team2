@@ -6,9 +6,11 @@ DIV ON THE PAGE.
 This function is passed the variables to initially draw on the x and y axes.
 **/
 function init(xAxisLabel, yAxisLabel){
-	var w = 1024;
-	var h = 540;
+	var margin = {top: 75, right: 10, bottom: 20, left: 100};
+	var w = 1024 - margin.left - margin.right;
+	var h = 540 - margin.top - margin.bottom;
 	var padding = 40;
+	
 	dataset = [];
 	colors = [d3.rgb("#17becf"), d3.rgb("#e6550d"), d3.rgb("#2ca02c")];
 	varieties = ["Kama", "Rosa", "Canadian"];
@@ -17,9 +19,12 @@ function init(xAxisLabel, yAxisLabel){
 	//Selecting svg element
 	svg = d3.select("#vis")
 		.append("svg")
-		.attr("width", w)
-		.attr("height", h)
-		.attr("onmousedown", "reset()");
+		.attr("width", w + margin.left + margin.right)
+		.attr("height", h + margin.top + margin.bottom)
+		.attr("onmousedown", "reset()")
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		
 
 	//Scale functions
 	xScale = d3.scale.linear()
