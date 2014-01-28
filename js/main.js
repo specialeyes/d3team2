@@ -18,7 +18,8 @@ function init(xAxisLabel, yAxisLabel){
 	svg = d3.select("#vis")
 		.append("svg")
 		.attr("width", w)
-		.attr("height", h);
+		.attr("height", h)
+		.attr("onmousedown", "reset()");
 
 	//Scale functions
 	xScale = d3.scale.linear()
@@ -244,4 +245,35 @@ function changeOpacity(type) {
 	circle.exit().remove();
 
 
+}
+function reset() {
+	
+	var circle = svg.selectAll("circle")
+			.data(dataset);
+			
+	circle.enter().append("circle")
+			.attr("r", 6);
+			
+	circle.attr("fill", function(d){
+				if (d["variety"] == "Kama") {
+					return colors[0];
+				}
+				else if (d["variety"] == "Rosa") {
+					return colors[1];
+				}
+				else {
+					return colors[2];
+				}
+			});
+			
+	circle.attr("opacity", function(d){ 
+	
+	
+		return 1;
+	
+				
+	});
+	
+	circle.exit().remove();
+	
 }
