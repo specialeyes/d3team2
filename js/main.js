@@ -11,6 +11,7 @@ function init(xAxisLabel, yAxisLabel){
 	var padding = 40;
 	dataset = [];
 	colors = [d3.rgb("#17becf"), d3.rgb("#e6550d"), d3.rgb("#2ca02c")];
+	varieties = ["Kama", "Rosa", "Canadian"];
 	selectColor = [d3.rgb("#0A5057"), d3.rgb("#813007"), d3.rgb("#164E16")];
 	
 	//Selecting svg element
@@ -42,9 +43,8 @@ function init(xAxisLabel, yAxisLabel){
 		dataset = data;
 
 		//Scale Functions
-		xScale.domain(calculateDomain(dataset, xAxisLabel));
-
-	    yScale.domain(calculateDomain(dataset, yAxisLabel));
+		xScale.domain(d3.extent(data, function(d) { return +d[xAxisLabel]; })).nice();
+		yScale.domain(d3.extent(data, function(d) { return +d[yAxisLabel]; })).nice();
 
 		//Adding circles to svg element
 		svg.selectAll("circle")
@@ -69,20 +69,20 @@ function init(xAxisLabel, yAxisLabel){
 					return colors[2];
 				}
 			})
-			.on("click", function(d) { 
-			
-			changeOpacity(d["variety"]);
-			if (d["variety"] == "Kama") {
-					this.setAttribute("fill", selectColor[0]);
-				}
-				else if (d["variety"] == "Rosa") {
-					this.setAttribute("fill", selectColor[1]);
-				}
-				else {
-					this.setAttribute("fill", selectColor[2]);
-				}
-			return showDetails("Compactness: " + (+d["compactness"]) + "<br/> Kernel Length: " + (+d["kernelLength"]) + "<br/>Kernel Width: " + (+d["kernelWidth"]) + "<br/>Asymmetry Coefficient: " + (+d["asymmetryCoefficient"]) + "<br/>Groove Length: " + (+d["grooveLength"]));
-			
+			.on("click", function(d) {
+
+				changeOpacity(d["variety"]);
+				if (d["variety"] == "Kama") {
+						this.setAttribute("fill", selectColor[0]);
+					}
+					else if (d["variety"] == "Rosa") {
+						this.setAttribute("fill", selectColor[1]);
+					}
+					else {
+						this.setAttribute("fill", selectColor[2]);
+					}
+				return showDetails("Compactness: " + (+d["compactness"]) + "<br/> Kernel Length: " + (+d["kernelLength"]) + "<br/>Kernel Width: " + (+d["kernelWidth"]) + "<br/>Asymmetry Coefficient: " + (+d["asymmetryCoefficient"]) + "<br/>Groove Length: " + (+d["grooveLength"]));
+
 			});
 
 		//Added axes to document
@@ -109,6 +109,26 @@ function init(xAxisLabel, yAxisLabel){
 			.style("text-anchor", "end")
 			.text(yAxisLabel.replace(/([A-Z])/g, ' $1')
 			.replace(/^./, function(str){ return str.toUpperCase(); }) + " (cm)");
+
+		//Adding the legend
+		legend = svg.selectAll(".legend")
+			.data(colors)
+			.enter().append("g")
+			.attr("class", "legend")
+			.attr("transform", function(d, i) {return "translate(0," + i * 20 + ")"; });
+
+		legend.append("rect")
+			.attr("x", w-18)
+			.attr("width", 18)
+			.attr("height", 18)
+			.style("fill", function(d, i) {return colors[i]});
+
+		legend.append("text")
+			.attr("x", w - 24)
+			.attr("y", 9)
+			.attr("dy", ".35em")
+			.style("text-anchor", "end")
+			.text(function(d, i) {return varieties[i];});
 	});
 
 }
@@ -129,7 +149,7 @@ function onXAxisChange(value){
 
 
 	//Recalculate domain
-	xScale.domain(calculateDomain(dataset, value));
+	xScale.domain(d3.extent(dataset, function(d) { return +d[value]; })).nice();
 	var xAxis = d3.svg.axis()
 		.scale(xScale)
 		.orient("bottom");
@@ -163,7 +183,7 @@ function onYAxisChange(value){
 	circle.enter().append("circle")
 			.attr("r", 6);
 
-	yScale.domain(calculateDomain(dataset, value));
+	yScale.domain(d3.extent(dataset, function(d) { return +d[value]; })).nice();
 	var yAxis = d3.svg.axis()
 		.scale(yScale)
 		.orient("left");
@@ -223,13 +243,5 @@ function changeOpacity(type) {
 	
 	circle.exit().remove();
 
-
-}
-function calculateDomain(dataset, label) {
-	var minimum = d3.min(dataset, function(d) {
-		return +d[label]});
-	var maximum = d3.max(dataset, function(d) {
-		return +d[label]});
-	return [minimum, maximum];
 
 }
